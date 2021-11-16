@@ -14,7 +14,7 @@ jobs:
       matrix:
         arch:
           # - x86_64-linux
-          # - x86_64-darwin
+          - x86_64-darwin
           - aarch64-linux
     steps:
       - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
@@ -27,7 +27,7 @@ jobs:
           nixBuildSshKey: ${{ secrets.NIX_BUILD_SSH_KEY }}
           nixCacheS3AccessKeyId: ${{ secrets.NIX_CACHE_S3_ACCESS_KEY_ID }}
           nixCacheS3SecretAccessKey: ${{ secrets.NIX_CACHE_S3_SECRET_ACCESS_KEY }}
-          nixBuilders: ec2-user@nix-graviton-builder.shopstic.org.github.beta.tailscale.net aarch64-linux;
+          nixBuilders: ec2-user@nix-graviton-builder.shopstic.org.github.beta.tailscale.net aarch64-linux; root@nix-x86-64-darwin.shopstic.org.github.beta.tailscale.net x86_64-darwin;
 
       - name: Info
         run: |
