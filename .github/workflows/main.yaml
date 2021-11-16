@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         arch:
-          - x86_64-linux
+          # - x86_64-linux
           - x86_64-darwin
           - aarch64-linux
     steps:
@@ -27,7 +27,7 @@ jobs:
           nixBuildSshKey: ${{ secrets.NIX_BUILD_SSH_KEY }}
           nixCacheS3AccessKeyId: ${{ secrets.NIX_CACHE_S3_ACCESS_KEY_ID }}
           nixCacheS3SecretAccessKey: ${{ secrets.NIX_CACHE_S3_SECRET_ACCESS_KEY }}
-          # nixBuilders: ec2-user@nix-graviton-builder.shopstic.org.github.beta.tailscale.net aarch64-linux; root@nix-x86-64-darwin.shopstic.org.github.beta.tailscale.net x86_64-darwin;
+          nixBuilders: ec2-user@nix-graviton-builder.shopstic.org.github.beta.tailscale.net aarch64-linux; root@nix-x86-64-darwin.shopstic.org.github.beta.tailscale.net x86_64-darwin;
 
       - name: Info
         run: |
@@ -36,6 +36,9 @@ jobs:
 
       - name: Build
         run: nix build -L -v --no-link '.#defaultPackage.${{ matrix.arch }}'
+
+      - name: Logout
+        run: sudo tailscale logout
 
       - name: Cache
         uses: shopstic/tailscale-nix-builder/cache@494e27520e3bbcd48d1d7fadc3c4538dd8838bef
