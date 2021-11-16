@@ -1,10 +1,15 @@
 {
   description = "FDB";
 
-  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs = {
+    flakeUtils = {
+      url = "github:numtide/flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachSystem [ "x86_64-darwin" "x86_64-linux" "aarch64-linux" ] (system:
+  outputs = { self, nixpkgs, flakeUtils }:
+    flakeUtils.lib.eachSystem [ "x86_64-darwin" "x86_64-linux" "aarch64-linux" ] (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         fdb = import ./fdb.nix {
