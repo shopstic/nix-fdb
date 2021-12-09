@@ -35,9 +35,6 @@
       {
         devShell = fdb.shell;
         defaultPackage = fdb.package;
-        packages = {
-          lib = fdb.package.lib;
-        };
       }
     );
 }

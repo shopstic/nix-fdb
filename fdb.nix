@@ -14,6 +14,7 @@
 , git
 , darwin ? null
 , version ? "6.3.22"
+, sha256 ? "CDoemOctjuU1Z0BiN0J8QbmhZcnXFqdBLcEEO2/XgEw="
 }:
 let
   darwinFrameworks = lib.optionals (darwin != null) (with darwin.apple_sdk.frameworks; [
@@ -49,7 +50,7 @@ in
       owner = "apple";
       repo = "foundationdb";
       rev = version;
-      sha256 = "CDoemOctjuU1Z0BiN0J8QbmhZcnXFqdBLcEEO2/XgEw=";
+      sha256 = sha256;
     };
 
     NIX_LDFLAGS = lbFlags;

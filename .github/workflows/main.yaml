@@ -15,7 +15,7 @@ jobs:
         arch:
           - x86_64-linux
           - x86_64-darwin
-          # - aarch64-linux
+          - aarch64-linux
     steps:
       - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
 
@@ -30,13 +30,6 @@ jobs:
       - name: Cache
         env: 
           NIX_OUTPUT: .#defaultPackage.${{ matrix.arch }}
-        run: |
-          nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
-          nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
-
-      - name: Cache lib
-        env: 
-          NIX_OUTPUT: .#packages.${{ matrix.arch }}.lib
         run: |
           nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
           nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
