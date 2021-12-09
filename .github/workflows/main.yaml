@@ -15,7 +15,7 @@ jobs:
         arch:
           - x86_64-linux
           - x86_64-darwin
-          - aarch64-linux
+          # - aarch64-linux
     steps:
       - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
 
