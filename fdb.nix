@@ -89,9 +89,12 @@ in
 
     installPhase = ''
       rsync -avrx --exclude={'docker','*.dll','*.exe','*.tar.gz','*-tests.jar'} ./packages/ $out/
+      cp -R $out/lib $lib
     '';
 
     dontPatchShebangs = true;
+
+    outputs = [ "out" "lib" ];
 
     meta = with lib; {
       description = "Open source, distributed, transactional key-value store";
