@@ -95,6 +95,7 @@ in
     '';
 
     dontPatchShebangs = true;
+    autoPatchelfIgnoreMissingDeps = true;
 
     outputs = [ "out" ];
 
