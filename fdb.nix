@@ -12,6 +12,7 @@
 , rsync
 , python3
 , git
+, autoPatchelfHook
 , darwin ? null
 , version ? "6.3.22"
 , sha256 ? "CDoemOctjuU1Z0BiN0J8QbmhZcnXFqdBLcEEO2/XgEw="
@@ -33,6 +34,7 @@ let
     rsync
     python3
     git
+    autoPatchelfHook
   ] ++ darwinFrameworks;
 in
 {
@@ -90,12 +92,11 @@ in
 
     installPhase = ''
       rsync -avrx --exclude={'docker','*.dll','*.exe','*.tar.gz','*-tests.jar'} ./packages/ $out/
-      cp -R $out/lib $lib
     '';
 
     dontPatchShebangs = true;
 
-    outputs = [ "out" "lib" ];
+    outputs = [ "out" ];
 
     meta = with lib; {
       description = "Open source, distributed, transactional key-value store";
