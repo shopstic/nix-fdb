@@ -2,6 +2,7 @@
   description = "FDB";
 
   inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/21.11";
     flakeUtils = {
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";

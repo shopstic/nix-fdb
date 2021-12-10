@@ -2,7 +2,7 @@
 , mkShellNoCC
 , fetchFromGitHub
 , stdenv
-, gcc10
+, gcc11
 , cmake
 , ninja
 , unzip
@@ -12,7 +12,6 @@
 , rsync
 , python3
 , git
-, autoPatchelfHook
 , darwin ? null
 , version ? "6.3.22"
 , sha256 ? "CDoemOctjuU1Z0BiN0J8QbmhZcnXFqdBLcEEO2/XgEw="
@@ -25,7 +24,7 @@ let
   lbFlags = lib.concatMapStringsSep " " (f: "-F${f}/Library/Frameworks") darwinFrameworks;
   buildInputs = [ boost172 ];
   nativeBuildInputs = [
-    gcc10
+    gcc11
     cmake
     ninja
     unzip
@@ -34,7 +33,7 @@ let
     rsync
     python3
     git
-    autoPatchelfHook
+    # autoPatchelfHook
   ] ++ darwinFrameworks;
 in
 {
@@ -62,7 +61,7 @@ in
     nativeBuildInputs = nativeBuildInputs;
 
     separateDebugInfo = true;
-    dontFixCmake = true;
+    # dontFixCmake = true;
 
     cmakeFlags = [
       "-G"
@@ -92,12 +91,13 @@ in
 
     installPhase = ''
       rsync -avrx --exclude={'docker','*.dll','*.exe','*.tar.gz','*-tests.jar'} ./packages/ $out/
+      cp -r $out/lib $lib
     '';
 
     dontPatchShebangs = true;
-    autoPatchelfIgnoreMissingDeps = true;
+    # autoPatchelfIgnoreMissingDeps = true;
 
-    outputs = [ "out" ];
+    outputs = [ "out" "lib" ];
 
     meta = with lib; {
       description = "Open source, distributed, transactional key-value store";
