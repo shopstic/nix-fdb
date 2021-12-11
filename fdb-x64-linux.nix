@@ -18,10 +18,10 @@ rec {
   };
 
   installPhase = ''
-    mkdir -p $out/bin $out/lib $lib/lib
+    mkdir -p $out/bin $out/lib $lib
     find . -type f -not -path "*.sha256" -exec cp {} $out/bin/ \;
     cp ${fdbLib} $out/lib/libfdb_c_${version}.so
-    cp ${fdbLib} $lib/lib/libfdb_c_${version}.so
+    cp ${fdbLib} $lib/libfdb_c_${version}.so
   '';
 
   outputs = [ "out" "lib" ];
