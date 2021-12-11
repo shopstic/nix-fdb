@@ -19,10 +19,7 @@
       in
       {
         devShell = fdb.shell;
-        defaultPackage =
-          if system == "x86_64-linux"
-          then pkgs.callPackage ./fdb-x64-linux.nix { }
-          else fdb.package;
+        defaultPackage = fdb.package;
       }
     );
 }

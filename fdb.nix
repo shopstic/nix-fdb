@@ -81,7 +81,12 @@ in
       EOF
       )
 
+      substituteInPlace ./bindings/c/CMakeLists.txt --replace \
+        'fdb_c.map,-z,nodelete")' \
+        'fdb_c.map,-z,nodelete,-z,noexecstack")'
+
       substituteInPlace ./fdbmonitor/fdbmonitor.cpp --replace "#ifdef __APPLE__" "''${FDB_MONITOR_PATCH}"
+
       substituteInPlace ./bindings/c/CMakeLists.txt --replace "if(NOT WIN32)" "if(false)"
     '';
 
