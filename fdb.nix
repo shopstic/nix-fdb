@@ -21,7 +21,7 @@ let
     CoreFoundation
     IOKit
   ]);
-  lbFlags = lib.concatMapStringsSep " " (f: "-F${f}/Library/Frameworks") darwinFrameworks;
+  ldFlags = lib.concatMapStringsSep " " (f: "-F${f}/Library/Frameworks") darwinFrameworks;
   buildInputs = [ boost172 ];
   nativeBuildInputs = [
     gcc11
@@ -39,7 +39,7 @@ in
 {
   shell = mkShellNoCC
     {
-      NIX_LDFLAGS = lbFlags;
+      NIX_LDFLAGS = ldFlags;
       buildInputs = buildInputs ++ nativeBuildInputs;
     };
 
@@ -54,7 +54,7 @@ in
       sha256 = sha256;
     };
 
-    NIX_LDFLAGS = lbFlags;
+    NIX_LDFLAGS = ldFlags;
     GIT_EXECUTABLE = git;
 
     buildInputs = buildInputs;
