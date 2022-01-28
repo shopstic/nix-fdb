@@ -12,9 +12,11 @@
 , rsync
 , python3
 , git
+, tree
 , darwin ? null
-, version ? "6.3.22"
-, sha256 ? "CDoemOctjuU1Z0BiN0J8QbmhZcnXFqdBLcEEO2/XgEw="
+, boringssl
+, version ? "6.3.23"
+, sha256 ? "sha256-H2plhQoA6+5cYewlS7ZosNu5a0+Ec5Y/Tw8uRLUoq80="
 }:
 let
   darwinFrameworks = lib.optionals (darwin != null) (with darwin.apple_sdk.frameworks; [
@@ -33,26 +35,29 @@ let
     rsync
     python3
     git
+    tree
+    boringssl
     # autoPatchelfHook
   ] ++ darwinFrameworks;
 in
-{
+rec {
   shell = mkShellNoCC
     {
       NIX_LDFLAGS = ldFlags;
       buildInputs = buildInputs ++ nativeBuildInputs;
     };
 
+  src = fetchFromGitHub {
+    owner = "apple";
+    repo = "foundationdb";
+    rev = version;
+    inherit sha256;
+  };
+
   package = stdenv.mkDerivation {
     pname = "foundationdb";
-    version = version;
 
-    src = fetchFromGitHub {
-      owner = "apple";
-      repo = "foundationdb";
-      rev = version;
-      sha256 = sha256;
-    };
+    inherit src version;
 
     NIX_LDFLAGS = ldFlags;
     GIT_EXECUTABLE = git;
@@ -96,6 +101,9 @@ in
 
     installPhase = ''
       rsync -avrx --exclude={'docker','*.dll','*.exe','*.tar.gz','*-tests.jar'} ./packages/ $out/
+      mkdir $out/bindings
+      cp ./bindings/c/foundationdb/fdb_c_options.g.h $out/bindings/
+      cp ${src}/bindings/c/foundationdb/fdb_c.h $out/bindings/
       cp -r $out/lib $lib
     '';
 
