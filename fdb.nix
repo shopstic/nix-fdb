@@ -101,16 +101,17 @@ rec {
 
     installPhase = ''
       rsync -avrx --exclude={'docker','*.dll','*.exe','*.tar.gz','*-tests.jar'} ./packages/ $out/
-      mkdir $out/bindings
-      cp ./bindings/c/foundationdb/fdb_c_options.g.h $out/bindings/
-      cp ${src}/bindings/c/foundationdb/fdb_c.h $out/bindings/
+      mkdir -p $out/bindings/foundationdb
+      cp ./bindings/c/foundationdb/fdb_c_options.g.h $out/bindings/foundationdb
+      cp ${src}/bindings/c/foundationdb/fdb_c.h $out/bindings/foundationdb
       cp -r $out/lib $lib
+      cp -r $out/bindings $bindings
     '';
 
     dontPatchShebangs = true;
     # autoPatchelfIgnoreMissingDeps = true;
 
-    outputs = [ "out" "lib" ];
+    outputs = [ "out" "lib" "bindings" ];
 
     meta = with lib; {
       description = "Open source, distributed, transactional key-value store";
