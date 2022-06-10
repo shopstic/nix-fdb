@@ -8,15 +8,15 @@
 , unzip
 , openjdk11
 , mono
-, boost172
+, boost178
 , rsync
 , python3
 , git
 , tree
 , darwin ? null
 , boringssl
-, version ? "6.3.23"
-, sha256 ? "sha256-H2plhQoA6+5cYewlS7ZosNu5a0+Ec5Y/Tw8uRLUoq80="
+, version ? "6.3.24"
+, sha256 ? "sha256-GMX0dFYnesT/R5lm3OtK1SyS7Jnd81duVJ5NmWcfHsU="
 }:
 let
   darwinFrameworks = lib.optionals (darwin != null) (with darwin.apple_sdk.frameworks; [
@@ -24,7 +24,7 @@ let
     IOKit
   ]);
   ldFlags = lib.concatMapStringsSep " " (f: "-F${f}/Library/Frameworks") darwinFrameworks;
-  buildInputs = [ boost172 ];
+  buildInputs = [ boost178 ];
   nativeBuildInputs = [
     gcc11
     cmake
