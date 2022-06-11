@@ -10,7 +10,7 @@
   };
 
   outputs = { self, nixpkgs, flakeUtils }:
-    flakeUtils.lib.eachSystem [ "x86_64-darwin" "x86_64-linux" "aarch64-linux" ] (system:
+    flakeUtils.lib.eachSystem [ "aarch64-darwin" "x86_64-darwin" "x86_64-linux" "aarch64-linux" ] (system:
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -18,13 +18,44 @@
             allowBroken = system == "x86_64-darwin";
           };
         };
-        fdb = pkgs.callPackage ./fdb.nix {
-          darwin = if pkgs.stdenv.isDarwin then pkgs.darwin else null;
-        };
+        fdb_6_pkgs =
+          if system != "aarch64-darwin" then {
+            fdb_6 = pkgs.callPackage ./nix/6.x/all.nix {
+              darwin = if pkgs.stdenv.isDarwin then pkgs.darwin else null;
+            };
+          } else { };
+        fdb_7_pkgs =
+          if system == "aarch64-darwin" then {
+            fdb_7 = pkgs.callPackage ./nix/7.x/aarch64-darwin.nix { };
+          }
+          else if pkgs.stdenv.isLinux then {
+            fdb_7 = pkgs.callPackage ./nix/7.x/linux.nix {
+              lz4 = pkgs.lz4.overrideAttrs (oldAttrs: {
+                makeFlags = [
+                  "PREFIX=$(out)"
+                  "INCLUDEDIR=$(dev)/include"
+                  "BUILD_STATIC=yes"
+                  "BUILD_SHARED=yes"
+                  "WINDRES:=${pkgs.stdenv.cc.bintools.targetPrefix}windres"
+                ];
+              });
+            };
+          }
+          else { };
       in
-      {
-        devShell = fdb.shell;
-        defaultPackage = fdb.package;
+      rec {
+        devShell = pkgs.mkShellNoCC {
+          buildInputs = builtins.attrValues {
+            inherit (pkgs)
+              lz4
+              ;
+          };
+        };
+        packages = fdb_6_pkgs // fdb_7_pkgs;
+        defaultPackage = pkgs.buildEnv {
+          name = "fdb";
+          paths = builtins.attrValues packages;
+        };
       }
     );
 }
