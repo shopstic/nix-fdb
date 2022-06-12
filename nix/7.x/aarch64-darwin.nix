@@ -1,5 +1,5 @@
 { version ? "7.1.9"
-, sha256 ? "sha256-jDRHXKhuIvs0dH+3CRTWCCA611DZgTa5GMqBrUwS8kg="
+, sha256 ? "sha256-he7NnkE3b3KqAkw/VdabXXeLnk5Ct4E/VE/ZOSf+ntw="
 , fetchurl
 , stdenv
 , lib

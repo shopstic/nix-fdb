@@ -86,7 +86,7 @@ stdenv.mkDerivation {
     rsync -avrx --exclude={'docker','*.dll','*.exe','*.tar.gz','*-tests.jar'} ./packages/ $out/
     mkdir -p $out/bindings/foundationdb
     cp ./bindings/c/foundationdb/fdb_c_options.g.h $out/bindings/foundationdb
-    cp ${src}/bindings/c/foundationdb/fdb_c.h $out/bindings/foundationdb
+    cp ${src}/bindings/c/foundationdb/*.h $out/bindings/foundationdb
     cp -r $out/lib $lib
     cp -r $out/bindings $bindings
   '';
