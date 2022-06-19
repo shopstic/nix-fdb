@@ -15,8 +15,8 @@
 , lz4
 , cacert
 , jemalloc
-, version ? "7.1.9"
-, sha256 ? "sha256-SZOyYvbeNDgyvR/1eRffpt5HEpRP7VDeS/EuAdaiBS8="
+, version ? "7.1.11"
+, sha256 ? "sha256-0rREUjnNClbv7Gt8HBPAgDQGzuL3vYv9u+ksSvyDPGk="
 }:
 let
   src = fetchFromGitHub {

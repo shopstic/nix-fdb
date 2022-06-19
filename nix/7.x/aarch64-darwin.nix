@@ -1,5 +1,5 @@
-{ version ? "7.1.9"
-, sha256 ? "sha256-1MynIfcw7R7wLr7FR7KP21KNAl54pv0dMmG63moxW4o="
+{ version ? "7.1.11"
+, sha256 ? "sha256-Dsggfbu/dJfQpa/HjmSzqh7iTHaJoNMDKyed1NEaDNc="
 , fetchurl
 , stdenv
 , lib
@@ -9,7 +9,7 @@ stdenv.mkDerivation {
   pname = "foundationdb";
 
   src = fetchurl {
-    url = "https://bin-cache.shopstic.com/fdb/aarch64-darwin/${version}-2.tar.gz";
+    url = "https://bin-cache.shopstic.com/fdb/aarch64-darwin/${version}.tar.gz";
     sha256 = sha256;
   };
 
