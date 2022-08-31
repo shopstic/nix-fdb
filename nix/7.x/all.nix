@@ -71,6 +71,7 @@ stdenv.mkDerivation {
 
   patchPhase =
     if stdenv.isDarwin then ''
+      substituteInPlace ./cmake/CompileBoost.cmake --replace "https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/" "https://bin-cache.shopstic.com/fdb-deps/"
       substituteInPlace ./cmake/CompileBoost.cmake --replace "/usr/bin/clang++" "${clang}/bin/clang++"
     ''
     # https://github.com/apple/foundationdb/pull/7319/files
