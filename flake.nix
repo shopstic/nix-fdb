@@ -44,7 +44,17 @@
           } else { };
         fdb_7_pkgs =
           if system != "x86_64-darwin" then {
-            fdb_7 = pkgs.callPackage ./nix/7.x/all.nix { };
+            fdb_7 = pkgs.callPackage ./nix/7.x/all.nix {
+              lz4 = pkgs.lz4.overrideAttrs (oldAttrs: {
+                makeFlags = [
+                  "PREFIX=$(out)"
+                  "INCLUDEDIR=$(dev)/include"
+                  "BUILD_STATIC=yes"
+                  "BUILD_SHARED=yes"
+                  "WINDRES:=${pkgs.stdenv.cc.bintools.targetPrefix}windres"
+                ];
+              });
+            };
           } else { };
         # if system == "aarch64-darwin" then {
         #   # fdb_7 = pkgs.callPackage ./nix/7.x/aarch64-darwin.nix { };
