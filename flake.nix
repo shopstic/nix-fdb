@@ -58,12 +58,23 @@
               }; in
             {
               fdb_7 = fdb_7_pkg // {
-                all = pkgs.buildEnv {
-                  name = "${fdb_7_pkg.name}-${fdb_7_pkg.version}-all";
-                  paths = [ fdb_7_pkg fdb_7_pkg.lib fdb_7_pkg.bindings ];
-                };
+                all = pkgs.linkFarm "${fdb_7_pkg.name}-all" [
+                  {
+                    name = "out";
+                    path = fdb_7_pkg;
+                  }
+                  {
+                    name = "lib";
+                    path = fdb_7_pkg.lib;
+                  }
+                  {
+                    name = "bindings";
+                    path = fdb_7_pkg.bindings;
+                  }
+                ];
               };
-            } else { };
+            }
+          else { };
         # if system == "aarch64-darwin" then {
         #   # fdb_7 = pkgs.callPackage ./nix/7.x/aarch64-darwin.nix { };
         #   fdb_7 = pkgs.callPackage ./nix/7.x/darwin.nix { };
