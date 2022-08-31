@@ -69,7 +69,22 @@ stdenv.mkDerivation {
     "-DSSD_ROCKSDB_EXPERIMENTAL=ON"
   ];
 
+  # https://github.com/apple/foundationdb/pull/7319/files
   patchPhase = ''
+    WriteOnlySet_PATCH=$(cat <<EOF
+    #include <random>
+    #include <thread>
+    EOF
+    )
+
+    substituteInPlace ./flow/WriteOnlySet.actor.cpp --replace "#include <random>" "''${WriteOnlySet_PATCH}"
+
+    substituteInPlace ./fdbbackup/FileDecoder.actor.cpp --replace \
+      'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC);' \
+      'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);'
+
+    substituteInPlace ./bindings/c/test/unit/third_party/CMakeLists.txt --replace "8424be522357e68d8c6178375546bb0cf9d5f6b3 # v2.4.1" "7b9885133108ae301ddd16e2651320f54cafeba7 # v2.4.8"
+
     substituteInPlace ./cmake/CompileBoost.cmake --replace "/usr/bin/clang++" "${clang}/bin/clang++"
   '';
 
