@@ -30,7 +30,7 @@ jobs:
             runner: arm64-darwin
             size: small
     env:
-      NIX_OUTPUT: '.#packages.${{ matrix.runner.arch }}.fdb_7'
+      NIX_OUTPUT: ".#packages.${{ matrix.runner.arch }}.fdb_7.toCache"
     steps:
       - uses: actions/checkout@v3
 
@@ -40,7 +40,8 @@ jobs:
           nix path-info '.#defaultPackage.${{ matrix.runner.arch }}' || true
 
       - name: Build
-        run: nix build -L -v --no-link "${NIX_OUTPUT}"
+        run: |
+          nix build -L -v --no-link "${NIX_OUTPUT}"
 
       - name: Cache
         run: |
