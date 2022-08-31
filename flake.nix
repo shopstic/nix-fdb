@@ -37,62 +37,45 @@
           };
         };
         fdb_6_pkgs =
-          if system != "aarch64-darwin" then {
+          pkgs.lib.optionalAttrs (system != "aarch64-darwin") {
             fdb_6 = pkgs.callPackage ./nix/6.x/all.nix {
               darwin = if pkgs.stdenv.isDarwin then pkgs.darwin else null;
             };
-          } else { };
+          };
         fdb_7_pkgs =
-          if system != "x86_64-darwin" then
-            let
-              fdb_7_pkg = pkgs.callPackage ./nix/7.x/all.nix {
-                lz4 = pkgs.lz4.overrideAttrs (oldAttrs: {
-                  makeFlags = [
-                    "PREFIX=$(out)"
-                    "INCLUDEDIR=$(dev)/include"
-                    "BUILD_STATIC=yes"
-                    "BUILD_SHARED=yes"
-                    "WINDRES:=${pkgs.stdenv.cc.bintools.targetPrefix}windres"
+          pkgs.lib.optionalAttrs (system != "x86_64-darwin")
+            (
+              let
+                fdb_7_pkg = pkgs.callPackage ./nix/7.x/all.nix {
+                  lz4 = pkgs.lz4.overrideAttrs (oldAttrs: {
+                    makeFlags = [
+                      "PREFIX=$(out)"
+                      "INCLUDEDIR=$(dev)/include"
+                      "BUILD_STATIC=yes"
+                      "BUILD_SHARED=yes"
+                      "WINDRES:=${pkgs.stdenv.cc.bintools.targetPrefix}windres"
+                    ];
+                  });
+                }; in
+              {
+                fdb_7 = fdb_7_pkg // {
+                  all = pkgs.linkFarm "${fdb_7_pkg.name}-all" [
+                    {
+                      name = "out";
+                      path = fdb_7_pkg;
+                    }
+                    {
+                      name = "lib";
+                      path = fdb_7_pkg.lib;
+                    }
+                    {
+                      name = "bindings";
+                      path = fdb_7_pkg.bindings;
+                    }
                   ];
-                });
-              }; in
-            {
-              fdb_7 = fdb_7_pkg // {
-                all = pkgs.linkFarm "${fdb_7_pkg.name}-all" [
-                  {
-                    name = "out";
-                    path = fdb_7_pkg;
-                  }
-                  {
-                    name = "lib";
-                    path = fdb_7_pkg.lib;
-                  }
-                  {
-                    name = "bindings";
-                    path = fdb_7_pkg.bindings;
-                  }
-                ];
-              };
-            }
-          else { };
-        # if system == "aarch64-darwin" then {
-        #   # fdb_7 = pkgs.callPackage ./nix/7.x/aarch64-darwin.nix { };
-        #   fdb_7 = pkgs.callPackage ./nix/7.x/darwin.nix { };
-        # }
-        # else if pkgs.stdenv.isLinux then {
-        #   fdb_7 = pkgs.callPackage ./nix/7.x/linux.nix {
-        #     lz4 = pkgs.lz4.overrideAttrs (oldAttrs: {
-        #       makeFlags = [
-        #         "PREFIX=$(out)"
-        #         "INCLUDEDIR=$(dev)/include"
-        #         "BUILD_STATIC=yes"
-        #         "BUILD_SHARED=yes"
-        #         "WINDRES:=${pkgs.stdenv.cc.bintools.targetPrefix}windres"
-        #       ];
-        #     });
-        #   };
-        # }
-        # else { };
+                };
+              }
+            );
         vscodeSettings = pkgs.writeTextFile {
           name = "vscode-settings.json";
           text = builtins.toJSON {
