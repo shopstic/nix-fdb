@@ -2,7 +2,7 @@
   description = "FDB";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/22.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
     flakeUtils = {
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -16,6 +16,24 @@
           inherit system;
           config = {
             allowBroken = system == "x86_64-darwin";
+            packageOverrides = pkgs: {
+              mono =
+                if system == "aarch64-darwin" then
+                  pkgs.mono.overrideAttrs
+                    (attrs: rec {
+                      version = "6.12.0.182";
+                      sha256 = "sha256-VzZqarTztezxEdSFSAMWFbOhANuHxnn8AG6Mik79lCQ=";
+                      src = pkgs.fetchurl {
+                        inherit sha256;
+                        url = "https://download.mono-project.com/sources/mono/${attrs.pname}-${version}.tar.xz";
+                      };
+                      meta = attrs.meta // {
+                        broken = false;
+                      };
+                    })
+                else
+                  pkgs.mono;
+            };
           };
         };
         fdb_6_pkgs =
@@ -25,29 +43,45 @@
             };
           } else { };
         fdb_7_pkgs =
-          if system == "aarch64-darwin" then {
-            fdb_7 = pkgs.callPackage ./nix/7.x/aarch64-darwin.nix { };
-          }
-          else if pkgs.stdenv.isLinux then {
-            fdb_7 = pkgs.callPackage ./nix/7.x/linux.nix {
-              lz4 = pkgs.lz4.overrideAttrs (oldAttrs: {
-                makeFlags = [
-                  "PREFIX=$(out)"
-                  "INCLUDEDIR=$(dev)/include"
-                  "BUILD_STATIC=yes"
-                  "BUILD_SHARED=yes"
-                  "WINDRES:=${pkgs.stdenv.cc.bintools.targetPrefix}windres"
-                ];
-              });
-            };
-          }
-          else { };
+          if system != "x86_64-darwin" then {
+            fdb_7 = pkgs.callPackage ./nix/7.x/all.nix { };
+          } else { };
+        # if system == "aarch64-darwin" then {
+        #   # fdb_7 = pkgs.callPackage ./nix/7.x/aarch64-darwin.nix { };
+        #   fdb_7 = pkgs.callPackage ./nix/7.x/darwin.nix { };
+        # }
+        # else if pkgs.stdenv.isLinux then {
+        #   fdb_7 = pkgs.callPackage ./nix/7.x/linux.nix {
+        #     lz4 = pkgs.lz4.overrideAttrs (oldAttrs: {
+        #       makeFlags = [
+        #         "PREFIX=$(out)"
+        #         "INCLUDEDIR=$(dev)/include"
+        #         "BUILD_STATIC=yes"
+        #         "BUILD_SHARED=yes"
+        #         "WINDRES:=${pkgs.stdenv.cc.bintools.targetPrefix}windres"
+        #       ];
+        #     });
+        #   };
+        # }
+        # else { };
+        vscodeSettings = pkgs.writeTextFile {
+          name = "vscode-settings.json";
+          text = builtins.toJSON {
+            "nix.enableLanguageServer" = true;
+            "nix.formatterPath" = pkgs.nixpkgs-fmt + "/bin/nixpkgs-fmt";
+            "nix.serverPath" = pkgs.rnix-lsp + "/bin/rnix-lsp";
+          };
+        };
       in
       rec {
         devShell = pkgs.mkShellNoCC {
+          shellHook = ''
+            mkdir -p ./.vscode
+            cat ${vscodeSettings} | jq . > ./.vscode/settings.json
+          '';
           buildInputs = builtins.attrValues {
             inherit (pkgs)
-              lz4
+              jq
               ;
           };
         };
