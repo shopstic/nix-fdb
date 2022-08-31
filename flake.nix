@@ -58,8 +58,8 @@
               }; in
             {
               fdb_7 = fdb_7_pkg // {
-                toCache = pkgs.buildEnv {
-                  name = "fdb-7-to-cache";
+                all = pkgs.buildEnv {
+                  name = "${fdb_7_pkg.name}-${fdb_7_pkg.version}-all";
                   paths = [ fdb_7_pkg fdb_7_pkg.lib fdb_7_pkg.bindings ];
                 };
               };

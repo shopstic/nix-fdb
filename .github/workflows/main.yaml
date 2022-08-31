@@ -30,7 +30,7 @@ jobs:
             runner: arm64-darwin
             size: small
     env:
-      NIX_OUTPUT: ".#packages.${{ matrix.runner.arch }}.fdb_7.toCache"
+      NIX_OUTPUT: ".#packages.${{ matrix.runner.arch }}.fdb_7.all"
     steps:
       - uses: actions/checkout@v3
 
