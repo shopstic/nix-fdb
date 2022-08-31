@@ -15,6 +15,7 @@
 , boringssl
 , cacert
 , lz4
+, jemalloc
 , darwin
 , version ? "7.1.20"
 , sha256 ? "sha256-l4SLnnFHFGF4GRilyv43IeE3NlYR6adAN2AUNY/mdMM="
@@ -51,6 +52,7 @@ stdenv.mkDerivation {
     darwin.apple_sdk.frameworks.CoreFoundation
     darwin.apple_sdk.frameworks.IOKit
   ] else [
+    jemalloc
     gcc11
   ]);
 
