@@ -17,8 +17,8 @@
 , lz4
 , jemalloc
 , darwin
-, version ? "7.1.20"
-, sha256 ? "sha256-l4SLnnFHFGF4GRilyv43IeE3NlYR6adAN2AUNY/mdMM="
+, version ? "7.1.21"
+, sha256 ? "sha256-6ORIvrotE9SHqv5qajyTFOkleGlqVkfQOzlNKWHNDqE="
 }:
 let
   src = fetchFromGitHub {
@@ -27,6 +27,30 @@ let
     rev = version;
     inherit sha256;
   };
+  patchBoostUrl = ''
+    substituteInPlace ./cmake/CompileBoost.cmake --replace "https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/" "https://bin-cache.shopstic.com/fdb-deps/"
+  '';
+  patchAvxOff = lib.optionalString (!stdenv.isx86_64) ''
+    substituteInPlace cmake/ConfigureCompiler.cmake --replace "USE_AVX ON" "USE_AVX OFF"
+  '';
+  patchDarwin = lib.optionalString stdenv.isDarwin ''
+    substituteInPlace ./cmake/CompileBoost.cmake --replace "/usr/bin/clang++" "${clang}/bin/clang++"
+  '';
+  patchLinux = lib.optionalString stdenv.isLinux ''
+    WriteOnlySet_PATCH=$(cat <<EOF
+    #include <random>
+    #include <thread>
+    EOF
+    )
+
+    substituteInPlace ./flow/WriteOnlySet.actor.cpp --replace "#include <random>" "''${WriteOnlySet_PATCH}"
+
+    substituteInPlace ./fdbbackup/FileDecoder.actor.cpp --replace \
+      'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC);' \
+      'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);'
+
+    substituteInPlace ./bindings/c/test/unit/third_party/CMakeLists.txt --replace "8424be522357e68d8c6178375546bb0cf9d5f6b3 # v2.4.1" "7b9885133108ae301ddd16e2651320f54cafeba7 # v2.4.8"
+  '';
 in
 stdenv.mkDerivation {
   pname = "foundationdb";
@@ -69,27 +93,7 @@ stdenv.mkDerivation {
     "-DSSD_ROCKSDB_EXPERIMENTAL=ON"
   ];
 
-  patchPhase =
-    if stdenv.isDarwin then ''
-      substituteInPlace ./cmake/CompileBoost.cmake --replace "https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/" "https://bin-cache.shopstic.com/fdb-deps/"
-      substituteInPlace ./cmake/CompileBoost.cmake --replace "/usr/bin/clang++" "${clang}/bin/clang++"
-    ''
-    # https://github.com/apple/foundationdb/pull/7319/files
-    else ''
-      WriteOnlySet_PATCH=$(cat <<EOF
-      #include <random>
-      #include <thread>
-      EOF
-      )
-
-      substituteInPlace ./flow/WriteOnlySet.actor.cpp --replace "#include <random>" "''${WriteOnlySet_PATCH}"
-
-      substituteInPlace ./fdbbackup/FileDecoder.actor.cpp --replace \
-        'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC);' \
-        'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);'
-
-      substituteInPlace ./bindings/c/test/unit/third_party/CMakeLists.txt --replace "8424be522357e68d8c6178375546bb0cf9d5f6b3 # v2.4.1" "7b9885133108ae301ddd16e2651320f54cafeba7 # v2.4.8"
-    '';
+  patchPhase = builtins.concatStringsSep "\n" [ patchBoostUrl patchAvxOff patchDarwin patchLinux ];
 
   buildPhase = ''
     ninja -j "$NIX_BUILD_CORES" -v
