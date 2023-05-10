@@ -61,6 +61,7 @@ stdenv.mkDerivation {
     lz4.dev
     jemalloc
     gcc11
+    autoPatchelfHook
   ];
 
   GIT_EXECUTABLE = git;
