@@ -16,6 +16,7 @@
 , cacert
 , lz4
 , jemalloc
+, autoPatchelfHook
 , version ? "7.1.33"
 , sha256 ? "sha256-A45PqG1Y5Fai3eeqiZCWTQjQhL9aULXrv4pWoNva0TI="
 }:
