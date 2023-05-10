@@ -2,7 +2,7 @@
   description = "FDB";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
     flakeUtils.url = "github:numtide/flake-utils";
   };
 
@@ -43,17 +43,26 @@
           pkgs.lib.optionalAttrs (system != "x86_64-darwin")
             (
               let
-                fdb_7_pkg = pkgs.callPackage ./nix/7.x/all.nix {
-                  lz4 = pkgs.lz4.overrideAttrs (oldAttrs: {
-                    makeFlags = [
-                      "PREFIX=$(out)"
-                      "INCLUDEDIR=$(dev)/include"
-                      "BUILD_STATIC=yes"
-                      "BUILD_SHARED=yes"
-                      "WINDRES:=${pkgs.stdenv.cc.bintools.targetPrefix}windres"
-                    ];
-                  });
-                }; in
+                fdb_7_pkg =
+                  if (system == "aarch64-darwin") then
+                    (
+                      pkgs.callPackage ./nix/7.x/aarch64-darwin.nix { }
+                    )
+                  else
+                    (
+                      pkgs.callPackage ./nix/7.x/linux.nix {
+                        lz4 = pkgs.lz4.overrideAttrs (oldAttrs: {
+                          makeFlags = [
+                            "PREFIX=$(out)"
+                            "INCLUDEDIR=$(dev)/include"
+                            "BUILD_STATIC=yes"
+                            "BUILD_SHARED=yes"
+                            "WINDRES:=${pkgs.stdenv.cc.bintools.targetPrefix}windres"
+                          ];
+                        });
+                      }
+                    );
+              in
               {
                 fdb_7 = fdb_7_pkg // {
                   all = pkgs.linkFarm "${fdb_7_pkg.name}-all" [

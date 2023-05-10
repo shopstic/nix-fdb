@@ -16,9 +16,8 @@
 , cacert
 , lz4
 , jemalloc
-, darwin
-, version ? "7.1.21"
-, sha256 ? "sha256-6ORIvrotE9SHqv5qajyTFOkleGlqVkfQOzlNKWHNDqE="
+, version ? "7.1.33"
+, sha256 ? "sha256-A45PqG1Y5Fai3eeqiZCWTQjQhL9aULXrv4pWoNva0TI="
 }:
 let
   src = fetchFromGitHub {
@@ -33,18 +32,7 @@ let
   patchAvxOff = lib.optionalString (!stdenv.isx86_64) ''
     substituteInPlace cmake/ConfigureCompiler.cmake --replace "USE_AVX ON" "USE_AVX OFF"
   '';
-  patchDarwin = lib.optionalString stdenv.isDarwin ''
-    substituteInPlace ./cmake/CompileBoost.cmake --replace "/usr/bin/clang++" "${clang}/bin/clang++"
-  '';
   patchLinux = lib.optionalString stdenv.isLinux ''
-    WriteOnlySet_PATCH=$(cat <<EOF
-    #include <random>
-    #include <thread>
-    EOF
-    )
-
-    substituteInPlace ./flow/WriteOnlySet.actor.cpp --replace "#include <random>" "''${WriteOnlySet_PATCH}"
-
     substituteInPlace ./fdbbackup/FileDecoder.actor.cpp --replace \
       'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC);' \
       'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);'
@@ -71,14 +59,9 @@ stdenv.mkDerivation {
     cacert
     lz4.out
     lz4.dev
-  ] ++ (if stdenv.isDarwin then [
-    clang
-    darwin.apple_sdk.frameworks.CoreFoundation
-    darwin.apple_sdk.frameworks.IOKit
-  ] else [
     jemalloc
     gcc11
-  ]);
+  ];
 
   GIT_EXECUTABLE = git;
 
@@ -93,7 +76,7 @@ stdenv.mkDerivation {
     "-DSSD_ROCKSDB_EXPERIMENTAL=ON"
   ];
 
-  patchPhase = builtins.concatStringsSep "\n" [ patchBoostUrl patchAvxOff patchDarwin patchLinux ];
+  patchPhase = builtins.concatStringsSep "\n" [ patchBoostUrl patchAvxOff patchLinux ];
 
   buildPhase = ''
     ninja -j "$NIX_BUILD_CORES" -v
@@ -104,8 +87,8 @@ stdenv.mkDerivation {
     mkdir -p $out/bindings/foundationdb
     cp ./bindings/c/foundationdb/fdb_c_options.g.h $out/bindings/foundationdb
     cp ${src}/bindings/c/foundationdb/*.h $out/bindings/foundationdb
-    cp -r $out/lib $lib
-    cp -r $out/bindings $bindings
+    mv $out/lib $lib
+    mv $out/bindings $bindings
   '';
 
   dontPatchShebangs = true;
@@ -116,7 +99,7 @@ stdenv.mkDerivation {
     description = "Open source, distributed, transactional key-value store";
     homepage = "https://www.foundationdb.org";
     license = licenses.asl20;
-    platforms = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
+    platforms = [ "x86_64-linux" "aarch64-linux" ];
   };
 }
 
