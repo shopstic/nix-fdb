@@ -67,8 +67,6 @@ stdenv.mkDerivation {
 
   GIT_EXECUTABLE = git;
 
-  separateDebugInfo = true;
-
   __noChroot = true;
 
   cmakeFlags = [
