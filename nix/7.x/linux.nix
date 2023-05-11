@@ -90,9 +90,10 @@ stdenv.mkDerivation {
     cp ./bindings/c/foundationdb/fdb_c_options.g.h $out/bindings/foundationdb
     cp ${src}/bindings/c/foundationdb/*.h $out/bindings/foundationdb
 
-    find $out/lib -type f -name "*.so" -exec patchelf --shrink-rpath --allowed-rpath-prefixes "${builtins.storeDir}" {} \;
-    cp -r $out/lib $lib
-    cp -r $out/bindings $bindings
+    mv $out/lib $lib
+    mv $out/bindings $bindings
+
+    find $lib -type f -name "*.so" -exec patchelf --shrink-rpath --allowed-rpath-prefixes "${builtins.storeDir}" {} \;
   '';
 
   dontPatchShebangs = true;
