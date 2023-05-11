@@ -72,7 +72,7 @@ stdenv.mkDerivation {
   patchPhase = builtins.concatStringsSep "\n" [ patchBoostUrl patchAvxOff ];
 
   buildPhase = ''
-    ninja -j "4" -v
+    ninja -j "$NIX_BUILD_CORES" -v
   '';
 
   installPhase = ''
