@@ -17,8 +17,8 @@
 , lz4
 , jemalloc
 , autoPatchelfHook
-, version ? "7.1.33"
-, sha256 ? "sha256-A45PqG1Y5Fai3eeqiZCWTQjQhL9aULXrv4pWoNva0TI="
+, version ? "7.2.7"
+, sha256 ? "sha256-a2Ep7Kl35D3SzKRf4MBpVzgKyNo+WWRN8ztGN4dPD+s="
 }:
 let
   src = fetchFromGitHub {
@@ -32,13 +32,6 @@ let
   '';
   patchAvxOff = lib.optionalString (!stdenv.isx86_64) ''
     substituteInPlace cmake/ConfigureCompiler.cmake --replace "USE_AVX ON" "USE_AVX OFF"
-  '';
-  patchLinux = lib.optionalString stdenv.isLinux ''
-    substituteInPlace ./fdbbackup/FileDecoder.actor.cpp --replace \
-      'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC);' \
-      'self->lfd = open(self->file.fileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);'
-
-    substituteInPlace ./bindings/c/test/unit/third_party/CMakeLists.txt --replace "8424be522357e68d8c6178375546bb0cf9d5f6b3 # v2.4.1" "7b9885133108ae301ddd16e2651320f54cafeba7 # v2.4.8"
   '';
 in
 stdenv.mkDerivation {
@@ -76,10 +69,10 @@ stdenv.mkDerivation {
     "-DSSD_ROCKSDB_EXPERIMENTAL=ON"
   ];
 
-  patchPhase = builtins.concatStringsSep "\n" [ patchBoostUrl patchAvxOff patchLinux ];
+  patchPhase = builtins.concatStringsSep "\n" [ patchBoostUrl patchAvxOff ];
 
   buildPhase = ''
-    ninja -j "$NIX_BUILD_CORES" -v
+    ninja -j "4" -v
   '';
 
   installPhase = ''

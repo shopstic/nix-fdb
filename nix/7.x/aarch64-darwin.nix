@@ -6,11 +6,11 @@
 , cpio
 }:
 let
-  version = "7.1.33";
+  version = "7.2.7";
   installer = fetchurl {
     name = "foundationdb-installer-${version}";
     url = "https://github.com/apple/foundationdb/releases/download/${version}/FoundationDB-${version}_arm64.pkg";
-    sha256 = "sha256-VlSIS3osL0pBw9OY+1H47EocwIXhSIyiu/hx/H9sbtQ=";
+    sha256 = "sha256-3lqouunvdBBXBQ8ujLCKwSewzLxZOVShgfbO+erg5/M=";
   };
 in
 runCommand "foundationdb-${version}"
