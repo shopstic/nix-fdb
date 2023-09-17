@@ -2,7 +2,7 @@
   description = "FDB";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
     flakeUtils.url = "github:numtide/flake-utils";
   };
 
@@ -13,24 +13,6 @@
           inherit system;
           config = {
             allowBroken = system == "x86_64-darwin";
-            packageOverrides = pkgs: {
-              mono =
-                if system == "aarch64-darwin" then
-                  pkgs.mono.overrideAttrs
-                    (attrs: rec {
-                      version = "6.12.0.182";
-                      sha256 = "sha256-VzZqarTztezxEdSFSAMWFbOhANuHxnn8AG6Mik79lCQ=";
-                      src = pkgs.fetchurl {
-                        inherit sha256;
-                        url = "https://download.mono-project.com/sources/mono/${attrs.pname}-${version}.tar.xz";
-                      };
-                      meta = attrs.meta // {
-                        broken = false;
-                      };
-                    })
-                else
-                  pkgs.mono;
-            };
           };
         };
         fdb_6_pkgs =
