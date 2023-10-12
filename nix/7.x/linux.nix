@@ -6,7 +6,7 @@
 , cmake
 , ninja
 , unzip
-, openjdk11
+# , openjdk11
 , mono
 , rsync
 , python3
@@ -50,7 +50,7 @@ stdenv.mkDerivation {
     cmake
     ninja
     unzip
-    openjdk11
+    # openjdk11
     mono
     rsync
     python3
