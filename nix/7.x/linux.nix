@@ -6,7 +6,7 @@
 , cmake
 , ninja
 , unzip
-# , openjdk11
+, openjdk11
 , mono
 , rsync
 , python3
@@ -17,6 +17,7 @@
 , lz4
 , jemalloc
 , autoPatchelfHook
+, removeReferencesTo
 , version ? "7.1.37"
 , sha256 ? "sha256-jJ1OUdjDhReY0iXzFlXu/cOE7dqu8LHuVRfkbuF8AtE="
 }:
@@ -50,7 +51,7 @@ stdenv.mkDerivation {
     cmake
     ninja
     unzip
-    # openjdk11
+    openjdk11
     mono
     rsync
     python3
@@ -63,6 +64,7 @@ stdenv.mkDerivation {
     jemalloc
     gcc11
     autoPatchelfHook
+    removeReferencesTo
   ];
 
   GIT_EXECUTABLE = git;
@@ -92,6 +94,7 @@ stdenv.mkDerivation {
     mv $out/bindings $bindings
 
     find $lib -type f -name "*.so" -exec patchelf --shrink-rpath --allowed-rpath-prefixes "${builtins.storeDir}" {} \;
+    remove-references-to -t "${openjdk11}" $lib/libfdb_java.so
   '';
 
   dontPatchShebangs = true;
