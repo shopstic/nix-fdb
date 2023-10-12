@@ -16,7 +16,6 @@
 , cacert
 , lz4
 , jemalloc
-, autoPatchelfHook
 , removeReferencesTo
 , version ? "7.1.37"
 , sha256 ? "sha256-jJ1OUdjDhReY0iXzFlXu/cOE7dqu8LHuVRfkbuF8AtE="
@@ -63,7 +62,6 @@ stdenv.mkDerivation {
     lz4.dev
     jemalloc
     gcc11
-    autoPatchelfHook
     removeReferencesTo
   ];
 
@@ -92,9 +90,6 @@ stdenv.mkDerivation {
 
     mv $out/lib $lib
     mv $out/bindings $bindings
-
-    find $lib -type f -name "*.so" -exec patchelf --shrink-rpath --allowed-rpath-prefixes "${builtins.storeDir}" {} \;
-    remove-references-to -t "${openjdk11}" $lib/libfdb_java.so
   '';
 
   dontPatchShebangs = true;
