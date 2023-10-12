@@ -74,6 +74,7 @@ stdenv.mkDerivation {
     "Ninja"
     "-DBUILD_DOCUMENTATION=OFF"
     "-DSSD_ROCKSDB_EXPERIMENTAL=ON"
+    "-DCMAKE_SKIP_BUILD_RPATH=ON"
   ];
 
   patchPhase = builtins.concatStringsSep "\n" [ patchBoostUrl patchAvxOff patchLinux ];
