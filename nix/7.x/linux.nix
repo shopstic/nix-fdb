@@ -6,6 +6,7 @@
 , cmake
 , ninja
 , unzip
+, openjdk11
 , mono
 , rsync
 , python3
@@ -16,6 +17,7 @@
 , lz4
 , jemalloc
 , glibc
+, removeReferencesTo
 , version ? "7.1.41"
 , sha256 ? "sha256-r6/TQiuVn/2AL70oGbhH8IwF9I6lqXkkUuFybaOpDVI="
 }:
@@ -49,6 +51,7 @@ stdenv.mkDerivation {
     cmake
     ninja
     unzip
+    openjdk11
     mono
     rsync
     python3
@@ -60,6 +63,7 @@ stdenv.mkDerivation {
     lz4.dev
     jemalloc
     gcc11
+    removeReferencesTo
   ];
 
   GIT_EXECUTABLE = git;
@@ -88,6 +92,10 @@ stdenv.mkDerivation {
 
     mv $out/lib $lib
     mv $out/bindings $bindings
+
+    remove-references-to -t ${gcc11.cc} $lib/libfdb_java.so
+    remove-references-to -t ${glibc.dev} $lib/libfdb_java.so
+    remove-references-to -t ${openjdk11} $lib/libfdb_java.so
   '';
 
   dontPatchShebangs = true;
