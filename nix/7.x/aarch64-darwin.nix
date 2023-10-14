@@ -3,6 +3,7 @@
 , lib
 , xar
 , gzip
+, unzip
 , cpio
 }:
 let
@@ -12,10 +13,15 @@ let
     url = "https://github.com/apple/foundationdb/releases/download/${version}/FoundationDB-${version}_arm64.pkg";
     sha256 = "sha256-qqDvGnWeYVbtnKF5itZGhHZBKca+6ELJr4CkPbWb9NU=";
   };
+  jar = fetchurl {
+    name = "foundationdb-jar-${version}";
+    url = "https://repo1.maven.org/maven2/org/foundationdb/fdb-java/${version}/fdb-java-${version}.jar";
+    sha256 = "sha256-IDMnaxRBL2g5cAiqLst1sD27AQ2qKgy6wTd0rm+i6jI=";
+  };
 in
 runCommand "foundationdb-${version}"
 {
-  nativeBuildInputs = [ xar gzip cpio ];
+  nativeBuildInputs = [ xar gzip unzip cpio ];
   outputs = [ "out" "lib" "bindings" ];
   meta = with lib; {
     description = "Open source, distributed, transactional key-value store";
@@ -36,4 +42,7 @@ runCommand "foundationdb-${version}"
   mv ./FoundationDB-clients.pkg/usr/local/include/foundationdb $bindings/foundationdb
   mv ./FoundationDB-clients.pkg/usr/local/lib/* $lib/
   mv ./FoundationDB-server.pkg/usr/local/libexec/* $out/bin/
+
+  unzip "${jar}"
+  mv ./lib/osx/aarch64/libfdb_java.jnilib $lib/
 ''
