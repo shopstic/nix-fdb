@@ -18,8 +18,8 @@
 , jemalloc
 , glibc
 , removeReferencesTo
-, version ? "7.1.41"
-, sha256 ? "sha256-r6/TQiuVn/2AL70oGbhH8IwF9I6lqXkkUuFybaOpDVI="
+, version ? "7.1.43"
+, sha256 ? "sha256-oaU30f+nbnK75e4uLPSbXyHezXe8/pFh/p6J1BvqL6o="
 }:
 let
   src = fetchFromGitHub {
