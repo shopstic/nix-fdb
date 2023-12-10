@@ -7,16 +7,16 @@
 , cpio
 }:
 let
-  version = "7.1.43";
+  version = "7.1.45";
   installer = fetchurl {
     name = "foundationdb-installer-${version}";
     url = "https://github.com/apple/foundationdb/releases/download/${version}/FoundationDB-${version}_arm64.pkg";
-    sha256 = "sha256-aFwQh9z11VLlmowkdkxTXpKBweRQHgbCoBA7jqLDmys=";
+    sha256 = "sha256-oHhzeCMMqiOP7mmCmJBd8xe57tZuTs851Ly6bpVgqDk=";
   };
   jar = fetchurl {
     name = "foundationdb-jar-${version}";
     url = "https://repo1.maven.org/maven2/org/foundationdb/fdb-java/${version}/fdb-java-${version}.jar";
-    sha256 = "sha256-rEZ9ZRR/cG/o1WoMg7tlIiVm/ojNpikf5se3IaZn+h0=";
+    sha256 = "sha256-oHhzeCMMqiOP7mmCmJBd8xe57tZuTs851Ly6bpVgqDk=";
   };
 in
 runCommand "foundationdb-${version}"
