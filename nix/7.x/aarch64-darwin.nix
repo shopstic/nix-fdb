@@ -11,7 +11,7 @@ let
   installer = fetchurl {
     name = "foundationdb-installer-${version}";
     url = "https://github.com/apple/foundationdb/releases/download/${version}/FoundationDB-${version}_arm64.pkg";
-    sha256 = "sha256-oHhzeCMMqiOP7mmCmJBd8xe57tZuTs851Ly6bpVgqDk=";
+    sha256 = "sha256-fQVDapI9Ay8hIYY29VXmhsxU+IdySrhYelUNuRlrmQY=";
   };
   jar = fetchurl {
     name = "foundationdb-jar-${version}";
