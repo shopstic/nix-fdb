@@ -17,8 +17,8 @@
 , lz4
 , jemalloc
 , autoPatchelfHook
-, version ? "7.1.37"
-, sha256 ? "sha256-jJ1OUdjDhReY0iXzFlXu/cOE7dqu8LHuVRfkbuF8AtE="
+, version ? "7.1.57"
+, sha256 ? "sha256-Z56SmqM3a7FM89WR/8npB3BIyE7xt2eeXZrV3fgYNic="
 }:
 let
   src = fetchFromGitHub {
