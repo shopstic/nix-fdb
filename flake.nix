@@ -2,7 +2,7 @@
   description = "FDB";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:nixos/nixpkgs/249fbde2a178a2ea2638b65b9ecebd531b338cf9";
     flakeUtils.url = "github:numtide/flake-utils";
   };
 
@@ -69,7 +69,14 @@
           text = builtins.toJSON {
             "nix.enableLanguageServer" = true;
             "nix.formatterPath" = pkgs.nixpkgs-fmt + "/bin/nixpkgs-fmt";
-            "nix.serverPath" = pkgs.rnix-lsp + "/bin/rnix-lsp";
+            "nix.serverSettings" = {
+              "nil" = {
+                "formatting" = {
+                  "command" = [ "nixpkgs-fmt" ];
+                };
+              };
+            };
+            "nix.serverPath" = pkgs.nil + "/bin/nil";
           };
         };
       in
